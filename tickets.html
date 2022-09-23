@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tickets purchase</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css" integrity="sha384-zCbKRCUGaJDkqS1kPbPd7TveP5iyJE0EjAuZQTgFLD2ylzuqKfdKlfG/eSrtxUkn" crossorigin="anonymous">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;700;900&family=Quicksand:wght@400;600&family=Rubik:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        html,body{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Quicksand', sans-serif;
+            background-image: url('/images/ticketsbg.jpg');
+            background-position: center;
+            background-size: cover;
+            color: black;
+        }
+
+        .flex-container {
+            display: flex;
+            justify-content: center;
+  
+        }
+
+        tr {
+            border-radius: 10px;
+            background-color: white;
+        }
+
+        td, th {
+            border: 1px solid rgb(255, 255, 255);
+            padding: 8px;
+            
+        }
+        
+        ion-icon {
+            font-size: 30px;
+            margin-right: 10px;
+        }
+        .btn-1 {
+            background-color: cornflowerblue;
+            color: white;
+        }
+
+        .btn-2 {
+            background-color: rgb(136, 108, 127);
+            color: white;
+        }
+        .btn-3 {
+            background-color: rgb(77, 77, 77);
+            color: white;
+        }
+        .navbar-brand {
+            color: black;
+            font-family: 'Quicksand', sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-light bg-transparent">
+            <a class="navbar-brand" href="./index.html">OUR GALLERY</a>
+          </nav>
+    </header>
+     <!-- choose ticket -->
+    <div class="container pt-5">
+        <div class="flex-container">
+            <ion-icon  name="ticket-outline"></ion-icon>
+            <h2 class="text-center">Ticket purchase</h2>
+        </div>
+        <div class="row">
+            <form id="postTicketForm" class="col-md-6 mx-auto">
+                <div class="form-group">
+                    <label for="visitor-name">Name</label>
+                    <input id="visitor-name" name="visitor-name" class="form-control" type="text">
+                </div>
+                <div class="form-group">
+                    <label for="exhibition-name">Exhibition</label>
+                    <select class="form-control" id="exhibition-name" name="exhibition-name">
+                      <option>Ally McIntyre</option>
+                      <option>Journeys</option>
+                      <option>Liminal</option>
+                      <option>Pawel Althamer</option>
+                      <option>Dear visitors...</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label for="ticket-type">Type</label>
+                    <select class="form-control" id="ticket-type" name="ticket-type">
+                      <option>Adult</option>
+                      <option>Pensioner</option>
+                      <option>School student</option>
+                    </select>
+                  </div>
+                <div class="form-group">
+                    <label for="event-date">Date</label>
+                    <input id="event-date" name="event-date" class="form-control" type="text">
+                </div>
+                <button class="btn btn-1" type="submit" onclick='window.location.reload()' id="add-ticket">Add</button>
+                <button class="btn btn-2" type="button" id="get-ticket">Get Tickets</button>
+            </form>
+        </div>
+        <br><br>
+        <div class="row">
+            <div class="mx-auto table-responsive">
+                <table class="table" id="tickets">
+                    <tr>
+                        <th scope="col">Ticket ID</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Exhibition</th>
+                        <th scope="col">Type</th>
+                        <th scope="col">Date</th>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div class="row">
+            <div class="mx-auto">
+                <button class="btn btn-3" type="click" onclick='window.location.reload()' id="delete-ticket">Delete Ticket</button>
+            </div>
+        </div>
+    </div>
+    <!-- End -->
+
+    <script>
+        document.getElementById('postTicketForm').addEventListener('submit', addTicket);
+        document.getElementById('get-ticket').addEventListener('click', getTickets);
+        document.getElementById('delete-ticket').addEventListener('click', deleteTicket);
+
+        function addTicket(event){
+            event.preventDefault();
+
+            var name=document.getElementById('visitor-name').value;
+            var exhibition=document.getElementById('exhibition-name').value;
+            var type=document.getElementById('ticket-type').value;
+            var date=document.getElementById('event-date').value;
+            var data=`name=${name}&exhibition=${exhibition}&type=${type}&date=${date}`;
+
+            var xhttp = new XMLHttpRequest();
+            xhttp.open('POST', 'http://localhost/tickets.php', true);
+            xhttp.setRequestHeader('Content-type','application/x-www-form-urlencoded');
+            xhttp.send(data);
+        }
+
+        function addTicketToDOM(element, table) {
+            var item = document.createElement('tr');
+            item.innerHTML = `
+                <th scope="row"> ${element.ticket_ID} </th>
+                <td> ${element.visitor_name} </td>
+                <td> ${element.exhibition} </td>
+                <td> ${element.ticket_type} </td>
+                <td> ${element.ticket_date} </td>
+            `;
+            table.appendChild(item, table);
+        }
+
+        function getTickets() {
+            console.log('---- getTicket() have been called ----');
+            var xhttp = new XMLHttpRequest();
+            xhttp.open('GET', 'http://localhost/mytickets.php', true);
+            xhttp.onload = function() {
+                if(this.status == 200) {
+                    var result = JSON.parse(this.responseText);
+                    var tickets = document.getElementById("tickets");
+
+                    for(var i = 0; i < result.length; i++) {
+                        addTicketToDOM(result[i], tickets);                       
+                    }
+                } 
+                else if(this.status == 404 || this.status == 403) {
+                    alert("The page is not found!");
+                }
+                else {
+                    alert("Some problem occured!", this.status);
+                }
+            }
+            xhttp.send();
+        }
+
+        function deleteTicket(){
+            console.log('---- deleteTicket() have been called ----');
+            var xhttp = new XMLHttpRequest();
+            xhttp.open('DELETE', 'http://localhost/deleteticket.php', true);
+            xhttp.send();
+          }
+
+          function deleteTicketFromDOM() { 
+            var item = document.getElementById("tickets");
+            item.parentNode.removeChild(item);
+        }
+    </script>
+
+
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-fQybjgWLrvvRgtW6bFlB7jaZrFsaBXjsOMm/tB9LTS58ONXgqbR9W8oWht/amnpF" crossorigin="anonymous"></script>
+</body>
+</html>
